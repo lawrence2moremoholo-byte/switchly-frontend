@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <html lang="en" data-theme="dark">
 </head>
 <body>
     <div class="app-container">
@@ -15,8 +14,7 @@
         <div class="sidebar">
             <div class="sidebar-header">
                 <button class="new-chat-btn" onclick="newChat()">
-                    <i class="fas fa-plus"></i>
-                    New chat
+                    <i class="fas fa-plus"></i> New Chat
                 </button>
                 <button class="sidebar-toggle" onclick="toggleSidebar()">
                     <i class="fas fa-bars"></i>
@@ -24,20 +22,16 @@
             </div>
             <div class="chat-history">
                 <div class="history-item active" data-section="chat">
-                    <i class="fas fa-message"></i>
-                    <span>Today</span>
+                    <i class="fas fa-message"></i><span>Today</span>
                 </div>
                 <div class="history-item" data-section="zuluLearning">
-                    <i class="fas fa-language"></i>
-                    <span>Zulu Learning</span>
+                    <i class="fas fa-language"></i><span>Zulu Learning</span>
                 </div>
                 <div class="history-item" data-section="businessIdeas">
-                    <i class="fas fa-lightbulb"></i>
-                    <span>Business Ideas</span>
+                    <i class="fas fa-lightbulb"></i><span>Business Ideas</span>
                 </div>
-                <div class="history-item" id="settingsBtn" data-section="settings">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
+                <div class="history-item" data-section="settings">
+                    <i class="fas fa-cog"></i><span>Settings</span>
                 </div>
             </div>
             <div class="sidebar-footer">
@@ -48,7 +42,7 @@
             </div>
         </div>
 
-        <!-- Main Chat Area -->
+        <!-- Main Content -->
         <div class="main-content">
             <div class="chat-header">
                 <div class="header-title">
@@ -56,85 +50,30 @@
                     <span class="subtitle">Zulu-English Code-Switching AI</span>
                 </div>
                 <div class="header-actions">
-                    <button class="icon-btn" onclick="toggleTheme()">
-                        <i class="fas fa-palette"></i>
-                    </button>
+                    <button class="icon-btn" onclick="toggleTheme()"><i class="fas fa-palette"></i></button>
                 </div>
             </div>
 
             <!-- Chat Section -->
             <div class="section" id="chatSection">
                 <div class="chat-messages" id="chatMessages">
-                    <!-- Welcome message -->
                     <div class="message bot">
                         <div class="avatar">S</div>
                         <div class="message-content">
-                            <div class="message-text">
-                                <p>Sawubona! I'm Switchly, Africa's first intelligent code-switching AI. I can understand and respond naturally in both English and isiZulu. How can I help you today?</p>
-                            </div>
+                            <p>Sawubona! I'm Switchly, Africa’s first intelligent code-switching AI. I can understand and respond naturally in both English and isiZulu. How can I help you today?</p>
                             <div class="message-time">Just now</div>
-                        </div>
-                        <div class="message-actions">
-                            <button class="action-btn"><i class="fas fa-copy"></i></button>
                         </div>
                     </div>
                 </div>
-
-                <!-- Typing Indicator -->
                 <div class="typing-indicator" id="typingIndicator" style="display: none;">
                     <div class="avatar">S</div>
                     <div class="typing-dots">
-                        <div class="dot"></div>
-                        <div class="dot"></div>
-                        <div class="dot"></div>
+                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
                     </div>
                 </div>
-
-                <!-- Input Area -->
                 <div class="input-container">
-                    <div class="input-wrapper">
-                        <div class="input-actions">
-                            <button class="action-btn"><i class="fas fa-paperclip"></i></button>
-                        </div>
-                        <textarea 
-                            id="messageInput" 
-                            placeholder="Message Switchly... (Mix Zulu and English naturally)" 
-                            rows="1"
-                            onkeydown="handleKeyDown(event)"
-                        ></textarea>
-                        <button class="send-btn" id="sendButton" onclick="sendMessage()">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                    <div class="disclaimer">
-                        <p>Switchly can make mistakes. Consider checking important information.</p>
-                    </div>
-                </div>
-
-                <!-- Quick Prompts -->
-                <div class="quick-prompts" id="quickPrompts">
-                    <div class="prompt-grid">
-                        <div class="prompt-card" onclick="usePrompt('Sawubona, unjani? Kungenzeka yini ukungisiza ngesiZulu?')">
-                            <i class="fas fa-language"></i>
-                            <h4>Zulu Assistance</h4>
-                            <p>Get help in isiZulu with English explanations</p>
-                        </div>
-                        <div class="prompt-card" onclick="usePrompt('Explain the difference between "ngiyabonga" and "siyabonga"')">
-                            <i class="fas fa-graduation-cap"></i>
-                            <h4>Language Learning</h4>
-                            <p>Understand Zulu grammar and vocabulary</p>
-                        </div>
-                        <div class="prompt-card" onclick="usePrompt('Help me write a business email in both English and Zulu')">
-                            <i class="fas fa-briefcase"></i>
-                            <h4>Business Communication</h4>
-                            <p>Professional messages in both languages</p>
-                        </div>
-                        <div class="prompt-card" onclick="usePrompt('Tell me a story that mixes Zulu and English naturally')">
-                            <i class="fas fa-book"></i>
-                            <h4>Cultural Stories</h4>
-                            <p>Experience authentic code-switching narratives</p>
-                        </div>
-                    </div>
+                    <textarea id="messageInput" placeholder="Message Switchly... (Mix Zulu & English naturally)" rows="1" onkeydown="handleKeyDown(event)"></textarea>
+                    <button class="send-btn" id="sendButton" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
 
@@ -144,47 +83,17 @@
                     <h2><i class="fas fa-language"></i> Zulu Learning</h2>
                     <p>Learn isiZulu with interactive lessons and practice</p>
                 </div>
-                
                 <div class="zulu-content">
                     <div class="zulu-column">
                         <h3>Common Phrases</h3>
                         <div class="phrase-category">
                             <h4>Greetings</h4>
-                            <div class="phrase-item">
-                                <strong>Hello:</strong> Sawubona
-                                <small>Pronunciation: sah-woo-BOH-nah</small>
-                            </div>
-                            <div class="phrase-item">
-                                <strong>How are you?:</strong> Unjani?
-                                <small>Pronunciation: oon-JAH-nee</small>
-                            </div>
-                            <div class="phrase-item">
-                                <strong>I'm fine:</strong> Ngikhona
-                                <small>Pronunciation: ngee-KOH-nah</small>
-                            </div>
-                            <div class="phrase-item">
-                                <strong>Thank you:</strong> Ngiyabonga
-                                <small>Pronunciation: ngee-yah-BOHN-gah</small>
-                            </div>
-                        </div>
-
-                        <div class="phrase-category">
-                            <h4>Business Phrases</h4>
-                            <div class="phrase-item">
-                                <strong>How much does it cost?:</strong> Malini?
-                                <small>Pronunciation: mah-LEE-nee</small>
-                            </div>
-                            <div class="phrase-item">
-                                <strong>I need help:</strong> Ngidinga usizo
-                                <small>Pronunciation: ngee-DEEN-gah oo-SEE-zoh</small>
-                            </div>
-                            <div class="phrase-item">
-                                <strong>Let's work together:</strong> Masisebenzisane
-                                <small>Pronunciation: mah-see-seh-ben-see-SAH-neh</small>
-                            </div>
+                            <div class="phrase-item"><strong>Hello:</strong> Sawubona <small>Pronunciation: sah-woo-BOH-nah</small></div>
+                            <div class="phrase-item"><strong>How are you?:</strong> Unjani? <small>Pronunciation: oon-JAH-nee</small></div>
+                            <div class="phrase-item"><strong>I’m fine:</strong> Ngikhona <small>Pronunciation: ngee-KOH-nah</small></div>
+                            <div class="phrase-item"><strong>Thank you:</strong> Ngiyabonga <small>Pronunciation: ngee-yah-BOHN-gah</small></div>
                         </div>
                     </div>
-
                     <div class="zulu-column">
                         <h3>Practice Translation</h3>
                         <div class="practice-area">
@@ -192,7 +101,6 @@
                             <button class="practice-btn" onclick="translateToZulu()">Translate to Zulu</button>
                             <div id="translationResult" class="translation-result"></div>
                         </div>
-
                         <div class="practice-area">
                             <h4>Quick Practice</h4>
                             <div class="practice-exercise">
@@ -216,7 +124,6 @@
                     <h2><i class="fas fa-lightbulb"></i> Business Ideas Generator</h2>
                     <p>Generate tailored business ideas based on your preferences</p>
                 </div>
-                
                 <div class="business-filters">
                     <div class="filter-group">
                         <label>Industry Preference:</label>
@@ -230,7 +137,6 @@
                             <option value="health">Health & Wellness</option>
                         </select>
                     </div>
-                    
                     <div class="filter-group">
                         <label>Investment Level:</label>
                         <select id="investmentSelect">
@@ -240,7 +146,6 @@
                             <option value="high">High ($10k+)</option>
                         </select>
                     </div>
-                    
                     <div class="filter-group">
                         <label>Location Type:</label>
                         <select id="locationSelect">
@@ -251,12 +156,8 @@
                             <option value="home">Home-based</option>
                         </select>
                     </div>
-                    
-                    <button class="generate-btn" onclick="generateBusinessIdeas()">
-                        <i class="fas fa-bolt"></i> Generate Ideas
-                    </button>
+                    <button class="generate-btn" onclick="generateBusinessIdeas()"><i class="fas fa-bolt"></i> Generate Ideas</button>
                 </div>
-
                 <div id="businessIdeasResults" class="business-ideas-results"></div>
             </div>
 
@@ -266,35 +167,25 @@
                     <h2><i class="fas fa-cog"></i> Switchly Settings</h2>
                     <p>Customize your AI experience</p>
                 </div>
-
                 <div class="settings-content">
-                    <!-- Model Selection -->
                     <div class="settings-section">
-                        <h3>1. Model Selection</h3>
-                        <p class="setting-description">Choose which AI model to use for responses</p>
+                        <h3>Model Selection</h3>
+                        <p class="setting-description">Choose which AI model to use</p>
                         <select id="modelSelect" class="setting-select">
-                            <option value="gpt-mini">GPT-5 Mini (Fast & Conversational)</option>
-                            <option value="gpt-full">GPT-5 Full (Detailed & Complex)</option>
-                            <option value="gemini">Gemini Pro (Balanced)</option>
-                            <option value="claude">Claude-3 (Creative)</option>
+                            <option value="gpt-mini">GPT-5 Mini</option>
+                            <option value="gpt-full">GPT-5 Full</option>
+                            <option value="gemini">Gemini Pro</option>
+                            <option value="claude">Claude-3</option>
                         </select>
                     </div>
-
-                    <!-- Temperature/Creativity -->
                     <div class="settings-section">
-                        <h3>2. Temperature / Creativity</h3>
-                        <p class="setting-description">Adjust how creative or predictable the responses are</p>
+                        <h3>Temperature / Creativity</h3>
+                        <p class="setting-description">Adjust creativity level</p>
                         <input type="range" id="temperatureSlider" min="0" max="100" value="70" class="setting-slider">
-                        <div class="slider-labels">
-                            <span>Precise (0)</span>
-                            <span>Balanced (0.7)</span>
-                            <span>Creative (1.0)</span>
-                        </div>
+                        <div class="slider-labels"><span>Precise (0)</span><span>Balanced (0.7)</span><span>Creative (1.0)</span></div>
                     </div>
-
-                    <!-- Tone/Personality -->
                     <div class="settings-section">
-                        <h3>3. Tone / Personality</h3>
+                        <h3>Tone / Personality</h3>
                         <p class="setting-description">Choose how the AI communicates</p>
                         <select id="toneSelect" class="setting-select">
                             <option value="friendly">Friendly & Casual</option>
@@ -304,54 +195,28 @@
                             <option value="zulu-english">Zulu-English Mix</option>
                         </select>
                     </div>
-
-                    <!-- Memory/Context -->
                     <div class="settings-section">
-                        <h3>4. Memory / Context</h3>
-                        <p class="setting-description">Control whether the AI remembers past conversations</p>
+                        <h3>Memory / Context</h3>
+                        <p class="setting-description">Control chat history memory</p>
                         <label class="toggle-setting">
                             <input type="checkbox" id="memoryToggle" checked>
                             <span class="toggle-slider"></span>
-                            <span class="toggle-label">Remember chat history across sessions</span>
+                            <span class="toggle-label">Remember chat across sessions</span>
                         </label>
                     </div>
-
-                    <!-- Plugins/Tools -->
                     <div class="settings-section">
-                        <h3>5. Plugins / Tools</h3>
-                        <p class="setting-description">Enable additional capabilities</p>
+                        <h3>Plugins / Tools</h3>
+                        <p class="setting-description">Enable extra capabilities</p>
                         <div class="checkbox-group">
-                            <label class="checkbox-setting">
-                                <input type="checkbox" id="webSearch">
-                                <span class="checkmark"></span>
-                                Web Search (Real-time information)
-                            </label>
-                            <label class="checkbox-setting">
-                                <input type="checkbox" id="codeExecution">
-                                <span class="checkmark"></span>
-                                Code Execution
-                            </label>
-                            <label class="checkbox-setting">
-                                <input type="checkbox" id="imageGeneration">
-                                <span class="checkmark"></span>
-                                Image Generation
-                            </label>
-                            <label class="checkbox-setting">
-                                <input type="checkbox" id="fileUpload" checked>
-                                <span class="checkmark"></span>
-                                File Upload (PDF, CSV, Text)
-                            </label>
+                            <label class="checkbox-setting"><input type="checkbox" id="webSearch"><span class="checkmark"></span> Web Search</label>
+                            <label class="checkbox-setting"><input type="checkbox" id="codeExecution"><span class="checkmark"></span> Code Execution</label>
+                            <label class="checkbox-setting"><input type="checkbox" id="imageGeneration"><span class="checkmark"></span> Image Generation</label>
+                            <label class="checkbox-setting"><input type="checkbox" id="fileUpload" checked><span class="checkmark"></span> File Upload</label>
                         </div>
                     </div>
-
-                    <!-- Save Settings -->
                     <div class="settings-actions">
-                        <button class="save-settings-btn" onclick="saveSettings()">
-                            <i class="fas fa-save"></i> Save Settings
-                        </button>
-                        <button class="reset-settings-btn" onclick="resetSettings()">
-                            <i class="fas fa-undo"></i> Reset to Defaults
-                        </button>
+                        <button class="save-settings-btn" onclick="saveSettings()"><i class="fas fa-save"></i> Save Settings</button>
+                        <button class="reset-settings-btn" onclick="resetSettings()"><i class="fas fa-undo"></i> Reset Defaults</button>
                     </div>
                 </div>
             </div>
@@ -361,4 +226,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
