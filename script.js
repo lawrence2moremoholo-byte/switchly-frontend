@@ -1,269 +1,366 @@
-// Configuration
-const CONFIG = {
-    SWITCHLY_API: 'https://moremoholo2-metawell-ai-chat.hf.space/api/predict',
-    OPENAI_API: 'https://api.openai.com/v1/chat/completions', // Backup API
-    OPENAI_API_KEY: 'your-openai-api-key-here' // You'll add this later
+// Add these to your existing State management section
+let appSettings = {
+    model: 'gpt-mini',
+    temperature: 0.7,
+    tone: 'friendly',
+    memory: true,
+    webSearch: false,
+    codeExecution: false,
+    imageGeneration: false,
+    fileUpload: true
 };
 
-// State management
-let currentChat = [];
-let isDarkTheme = true;
+let currentSection = 'chat';
 
-// Initialize app
+// Add to your existing Initialize app function
 document.addEventListener('DOMContentLoaded', function() {
     loadTheme();
     focusInput();
     showQuickPrompts();
+    initializeNavigation(); // Add this line
+    loadSavedSettings();   // Add this line
 });
 
-// Main message sending function
-async function sendMessage() {
-    const input = document.getElementById('messageInput');
-    const button = document.getElementById('sendButton');
-    const message = input.value.trim();
+// Navigation between sections
+function initializeNavigation() {
+    const historyItems = document.querySelectorAll('.history-item');
     
-    if (!message) return;
-    
-    // Add user message
-    addMessage(message, 'user');
-    input.value = '';
-    button.disabled = true;
-    hideQuickPrompts();
-    
-    // Show typing indicator
-    showTyping();
-    
-    try {
-        // Try Switchly API first
-        let response = await callSwitchlyAPI(message);
-        
-        // If Switchly fails, try OpenAI as backup
-        if (!response || response.includes('error') || response.includes('Sorry')) {
-            console.log('Switchly API failed, trying OpenAI backup...');
-            response = await callOpenAI(message);
-        }
-        
-        hideTyping();
-        addMessage(response, 'bot');
-        
-    } catch (error) {
-        hideTyping();
-        addMessage('Sorry, I encountered an error. Please try again.', 'bot');
-        console.error('API Error:', error);
-    } finally {
-        button.disabled = false;
-        focusInput();
-    }
-}
-
-// Switchly API call
-async function callSwitchlyAPI(message) {
-    try {
-        const response = await fetch(CONFIG.SWITCHLY_API, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                data: [message]
-            })
+    historyItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const targetSection = this.getAttribute('data-section');
+            
+            // Update active item
+            historyItems.forEach(hi => hi.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Show target section
+            showSection(targetSection);
         });
-        
-        if (response.ok) {
-            const data = await response.json();
-            return data.data[0];
-        } else {
-            throw new Error(`HTTP ${response.status}`);
-        }
-    } catch (error) {
-        console.error('Switchly API error:', error);
-        throw error;
-    }
-}
-
-// OpenAI backup API call
-async function callOpenAI(message) {
-    if (!CONFIG.OPENAI_API_KEY || CONFIG.OPENAI_API_KEY === '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') {
-        return "I'm currently experiencing high demand. Please try again in a moment.";
-    }
-    
-    try {
-        const response = await fetch(CONFIG.OPENAI_API, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${CONFIG.OPENAI_API_KEY}`
-            },
-            body: JSON.stringify({
-                model: 'gpt-3.5-turbo',
-                messages: [
-                    {
-                        role: 'system',
-                        content: `You are Switchly, an AI assistant that specializes in Zulu-English code-switching. 
-                        Respond naturally mixing both languages. Use Zulu phrases like Sawubona, Yebo, Hawu, Ngiyabonga 
-                        appropriately. Keep responses conversational and helpful.`
-                    },
-                    {
-                        role: 'user',
-                        content: message
-                    }
-                ],
-                max_tokens: 500,
-                temperature: 0.7
-            })
-        });
-        
-        if (response.ok) {
-            const data = await response.json();
-            return data.choices[0].message.content;
-        } else {
-            throw new Error(`OpenAI API error: ${response.status}`);
-        }
-    } catch (error) {
-        console.error('OpenAI API error:', error);
-        return "I'm having trouble connecting right now. Please try again shortly.";
-    }
-}
-
-// UI Functions
-function addMessage(text, sender) {
-    const messagesContainer = document.getElementById('chatMessages');
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${sender}`;
-    
-    const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    
-    messageDiv.innerHTML = `
-        <div class="avatar">${sender === 'user' ? 'Y' : 'S'}</div>
-        <div class="message-content">
-            <div class="message-text">
-                <p>${escapeHtml(text)}</p>
-            </div>
-            <div class="message-time">${timestamp}</div>
-        </div>
-        <div class="message-actions">
-            <button class="action-btn" onclick="copyMessage(this)">
-                <i class="fas fa-copy"></i>
-            </button>
-        </div>
-    `;
-    
-    messagesContainer.appendChild(messageDiv);
-    scrollToBottom();
-    
-    // Add to chat history
-    currentChat.push({ sender, text, timestamp });
-}
-
-function showTyping() {
-    const typingIndicator = document.getElementById('typingIndicator');
-    typingIndicator.style.display = 'flex';
-    scrollToBottom();
-}
-
-function hideTyping() {
-    const typingIndicator = document.getElementById('typingIndicator');
-    typingIndicator.style.display = 'none';
-}
-
-function showQuickPrompts() {
-    const messagesContainer = document.getElementById('chatMessages');
-    if (messagesContainer.children.length <= 1) { // Only welcome message
-        const quickPrompts = document.getElementById('quickPrompts');
-        quickPrompts.style.display = 'block';
-    }
-}
-
-function hideQuickPrompts() {
-    const quickPrompts = document.getElementById('quickPrompts');
-    quickPrompts.style.display = 'none';
-}
-
-function usePrompt(prompt) {
-    document.getElementById('messageInput').value = prompt;
-    hideQuickPrompts();
-    focusInput();
-}
-
-function newChat() {
-    const messagesContainer = document.getElementById('chatMessages');
-    const welcomeMessage = messagesContainer.children[0];
-    messagesContainer.innerHTML = '';
-    messagesContainer.appendChild(welcomeMessage);
-    currentChat = [];
-    showQuickPrompts();
-}
-
-function toggleSidebar() {
-    const sidebar = document.querySelector('.sidebar');
-    sidebar.classList.toggle('open');
-}
-
-function toggleTheme() {
-    isDarkTheme = !isDarkTheme;
-    document.documentElement.setAttribute('data-theme', isDarkTheme ? 'dark' : 'light');
-    localStorage.setItem('switchly-theme', isDarkTheme ? 'dark' : 'light');
-}
-
-function loadTheme() {
-    const savedTheme = localStorage.getItem('switchly-theme') || 'dark';
-    isDarkTheme = savedTheme === 'dark';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-}
-
-function copyMessage(button) {
-    const messageText = button.closest('.message').querySelector('.message-text p').textContent;
-    navigator.clipboard.writeText(messageText).then(() => {
-        const icon = button.querySelector('i');
-        const originalIcon = icon.className;
-        icon.className = 'fas fa-check';
-        setTimeout(() => {
-            icon.className = originalIcon;
-        }, 2000);
     });
 }
 
-function handleKeyDown(event) {
-    if (event.key === 'Enter' && !event.shiftKey) {
-        event.preventDefault();
-        sendMessage();
+function showSection(sectionName) {
+    // Hide all sections
+    document.querySelectorAll('.section').forEach(section => {
+        section.classList.add('hidden');
+    });
+    
+    // Show target section
+    const targetElement = document.getElementById(sectionName + 'Section');
+    if (targetElement) {
+        targetElement.classList.remove('hidden');
     }
     
-    // Auto-resize textarea
-    const textarea = event.target;
-    textarea.style.height = 'auto';
-    textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    currentSection = sectionName;
+    
+    // Special handling for chat section
+    if (sectionName === 'chat') {
+        showQuickPrompts();
+    } else {
+        hideQuickPrompts();
+    }
 }
 
-function focusInput() {
-    const input = document.getElementById('messageInput');
-    input.focus();
-    input.style.height = 'auto';
-}
-
-function scrollToBottom() {
-    const messagesContainer = document.getElementById('chatMessages');
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
-
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-// Export chat function (optional)
-function exportChat() {
-    const chatData = {
-        timestamp: new Date().toISOString(),
-        chat: currentChat
+// Zulu Learning Functions
+function translateToZulu() {
+    const englishText = document.getElementById('englishInput').value.trim();
+    if (!englishText) return;
+    
+    const simpleTranslations = {
+        'hello': 'Sawubona',
+        'good morning': 'Sawubona',
+        'good afternoon': 'Sanibonani',
+        'good evening': 'Sanibonani',
+        'how are you': 'Unjani?',
+        'i am fine': 'Ngikhona',
+        'thank you': 'Ngiyabonga',
+        'thank you very much': 'Ngiyabonga kakhulu',
+        'please': 'Ngiyacela',
+        'yes': 'Yebo',
+        'no': 'Cha',
+        'goodbye': 'Hamba kahle',
+        'see you later': 'Sizobonana kamuva',
+        'what is your name': 'Ungubani igama lakho?',
+        'my name is': 'Igama lami ngu',
+        'how much': 'Malini?',
+        'i need help': 'Ngidinga usizo',
+        'where is': 'Likuphi i',
+        'i understand': 'Ngiyaqonda',
+        'i dont understand': 'Angizwisisi'
     };
     
-    const dataStr = JSON.stringify(chatData, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const lowerText = englishText.toLowerCase();
+    let translation = 'Hmm, angikwazi ukukuhumusha lokhu. Ngiyaxolisa. (I cannot translate this yet. Sorry.)';
     
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(dataBlob);
-    link.download = `switchly-chat-${new Date().getTime()}.json`;
-    link.click();
+    for (const [eng, zul] of Object.entries(simpleTranslations)) {
+        if (lowerText.includes(eng)) {
+            translation = zul;
+            break;
+        }
+    }
+    
+    document.getElementById('translationResult').innerHTML = `
+        <strong>English:</strong> ${englishText}<br>
+        <strong>isiZulu:</strong> ${translation}
+    `;
+}
+
+function showAnswer(elementId) {
+    const element = document.getElementById(elementId);
+    element.classList.remove('hidden');
+}
+
+// Business Ideas Functions
+function generateBusinessIdeas() {
+    const industry = document.getElementById('industrySelect').value;
+    const investment = document.getElementById('investmentSelect').value;
+    const location = document.getElementById('locationSelect').value;
+    
+    const allIdeas = [
+        {
+            title: "Online Zulu Language Tutoring Platform",
+            description: "Connect Zulu language learners with native speakers for virtual lessons and cultural exchange.",
+            industry: "education",
+            investment: "low",
+            location: "online"
+        },
+        {
+            title: "African Craft E-commerce Store",
+            description: "Sell authentic African crafts and artifacts to international markets with cultural storytelling.",
+            industry: "retail",
+            investment: "medium",
+            location: "online"
+        },
+        {
+            title: "Local Food Delivery Service",
+            description: "Focus on traditional Zulu cuisine and healthy meal options for urban professionals.",
+            industry: "food",
+            investment: "medium",
+            location: "local"
+        },
+        {
+            title: "Mobile App Development Agency",
+            description: "Create custom mobile applications for local businesses looking to digitize their operations.",
+            industry: "tech",
+            investment: "low",
+            location: "online"
+        },
+        {
+            title: "Co-working Space with Cultural Programming",
+            description: "Provide workspace with regular cultural events, language classes, and business networking.",
+            industry: "services",
+            investment: "high",
+            location: "local"
+        },
+        {
+            title: "Digital Marketing Agency for Local Businesses",
+            description: "Help small businesses establish online presence with culturally relevant marketing strategies.",
+            industry: "services",
+            investment: "low",
+            location: "online"
+        },
+        {
+            title: "Sustainable Farming and Produce Delivery",
+            description: "Organic farming with direct-to-consumer delivery of fresh produce and traditional ingredients.",
+            industry: "food",
+            investment: "medium",
+            location: "mobile"
+        },
+        {
+            title: "Health and Wellness Coaching Service",
+            description: "Combine modern wellness practices with traditional Zulu health knowledge and remedies.",
+            industry: "health",
+            investment: "low",
+            location: "online"
+        }
+    ];
+    
+    // Filter ideas based on selections
+    let filteredIdeas = allIdeas;
+    
+    if (industry) {
+        filteredIdeas = filteredIdeas.filter(idea => idea.industry === industry);
+    }
+    
+    if (investment) {
+        filteredIdeas = filteredIdeas.filter(idea => idea.investment === investment);
+    }
+    
+    if (location) {
+        filteredIdeas = filteredIdeas.filter(idea => idea.location === location);
+    }
+    
+    // If no filters selected or no matches, show random ideas
+    if (filteredIdeas.length === 0) {
+        filteredIdeas = allIdeas.sort(() => 0.5 - Math.random()).slice(0, 4);
+    }
+    
+    displayBusinessIdeas(filteredIdeas);
+}
+
+function displayBusinessIdeas(ideas) {
+    const resultsContainer = document.getElementById('businessIdeasResults');
+    
+    if (ideas.length === 0) {
+        resultsContainer.innerHTML = '<p>No business ideas found matching your criteria. Try adjusting your filters.</p>';
+        return;
+    }
+    
+    let ideasHTML = '<h3>Generated Business Ideas</h3>';
+    
+    ideas.forEach((idea, index) => {
+        ideasHTML += `
+            <div class="business-idea-card">
+                <h4>${idea.title}</h4>
+                <p>${idea.description}</p>
+                <div class="idea-meta">
+                    <span><strong>Industry:</strong> ${getIndustryName(idea.industry)}</span>
+                    <span><strong>Investment:</strong> ${getInvestmentName(idea.investment)}</span>
+                    <span><strong>Location:</strong> ${getLocationName(idea.location)}</span>
+                </div>
+                <div class="idea-actions">
+                    <button class="idea-btn" onclick="expandIdea(${index})">View Details</button>
+                    <button class="idea-btn" onclick="saveIdea('${idea.title}')">Save Idea</button>
+                </div>
+            </div>
+        `;
+    });
+    
+    resultsContainer.innerHTML = ideasHTML;
+}
+
+function getIndustryName(key) {
+    const industries = {
+        'tech': 'Technology',
+        'food': 'Food & Beverage',
+        'retail': 'Retail',
+        'services': 'Services',
+        'education': 'Education',
+        'health': 'Health & Wellness'
+    };
+    return industries[key] || key;
+}
+
+function getInvestmentName(key) {
+    const investments = {
+        'low': 'Low (Under $1k)',
+        'medium': 'Medium ($1k-$10k)',
+        'high': 'High ($10k+)'
+    };
+    return investments[key] || key;
+}
+
+function getLocationName(key) {
+    const locations = {
+        'online': 'Online',
+        'local': 'Local Store',
+        'mobile': 'Mobile',
+        'home': 'Home-based'
+    };
+    return locations[key] || key;
+}
+
+function expandIdea(index) {
+    // In a real app, this would show more detailed information
+    alert('Detailed business plan view would open here with:\n- Market analysis\n- Startup costs\n- Revenue projections\n- Marketing strategy\n- Implementation timeline');
+}
+
+function saveIdea(ideaTitle) {
+    // In a real app, this would save to local storage or database
+    alert(`Business idea "${ideaTitle}" saved to your favorites!`);
+}
+
+// Settings Functions
+function loadSavedSettings() {
+    const saved = localStorage.getItem('switchlySettings');
+    if (saved) {
+        appSettings = { ...appSettings, ...JSON.parse(saved) };
+        applySettingsToUI();
+    }
+}
+
+function applySettingsToUI() {
+    document.getElementById('modelSelect').value = appSettings.model;
+    document.getElementById('temperatureSlider').value = appSettings.temperature * 100;
+    document.getElementById('toneSelect').value = appSettings.tone;
+    document.getElementById('memoryToggle').checked = appSettings.memory;
+    document.getElementById('webSearch').checked = appSettings.webSearch;
+    document.getElementById('codeExecution').checked = appSettings.codeExecution;
+    document.getElementById('imageGeneration').checked = appSettings.imageGeneration;
+    document.getElementById('fileUpload').checked = appSettings.fileUpload;
+}
+
+function saveSettings() {
+    appSettings = {
+        model: document.getElementById('modelSelect').value,
+        temperature: document.getElementById('temperatureSlider').value / 100,
+        tone: document.getElementById('toneSelect').value,
+        memory: document.getElementById('memoryToggle').checked,
+        webSearch: document.getElementById('webSearch').checked,
+        codeExecution: document.getElementById('codeExecution').checked,
+        imageGeneration: document.getElementById('imageGeneration').checked,
+        fileUpload: document.getElementById('fileUpload').checked
+    };
+
+    localStorage.setItem('switchlySettings', JSON.stringify(appSettings));
+    
+    // Show confirmation
+    alert('Settings saved successfully!');
+    
+    // Update chat behavior based on new settings
+    updateChatBehavior();
+}
+
+function resetSettings() {
+    if (confirm('Are you sure you want to reset all settings to default?')) {
+        appSettings = {
+            model: 'gpt-mini',
+            temperature: 0.7,
+            tone: 'friendly',
+            memory: true,
+            webSearch: false,
+            codeExecution: false,
+            imageGeneration: false,
+            fileUpload: true
+        };
+        
+        applySettingsToUI();
+        localStorage.removeItem('switchlySettings');
+        alert('Settings reset to defaults!');
+    }
+}
+
+function updateChatBehavior() {
+    // This function would modify how your chat works based on settings
+    console.log('Chat behavior updated with settings:', appSettings);
+    
+    // You can integrate these settings into your existing chat functions
+    // For example, modify the API calls based on model selection
+    // or adjust response style based on temperature and tone
+}
+
+// Update your existing newChat function to handle section switching
+function newChat() {
+    if (currentSection === 'chat') {
+        const messagesContainer = document.getElementById('chatMessages');
+        const welcomeMessage = messagesContainer.children[0];
+        messagesContainer.innerHTML = '';
+        messagesContainer.appendChild(welcomeMessage);
+        currentChat = [];
+        showQuickPrompts();
+    } else {
+        // If not in chat section, switch to chat and start new chat
+        showSection('chat');
+        const historyItems = document.querySelectorAll('.history-item');
+        historyItems.forEach(hi => hi.classList.remove('active'));
+        document.querySelector('.history-item[data-section="chat"]').classList.add('active');
+        
+        // Clear existing chat
+        const messagesContainer = document.getElementById('chatMessages');
+        const welcomeMessage = messagesContainer.children[0];
+        messagesContainer.innerHTML = '';
+        messagesContainer.appendChild(welcomeMessage);
+        currentChat = [];
+        showQuickPrompts();
+    }
 }
