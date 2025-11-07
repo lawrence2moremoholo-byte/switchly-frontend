@@ -1,3 +1,32 @@
+:root {
+    --primary-bg: #343541;
+    --secondary-bg: #444654;
+    --sidebar-bg: #202123;
+    --accent-color: #10a37f;
+    --accent-hover: #0d906b;
+    --text-primary: #ffffff;
+    --text-secondary: #d1d5db;
+    --text-muted: #9ca3af;
+    --border-color: #4b5563;
+    --input-bg: #40414f;
+    --message-bg-user: #343541;
+    --message-bg-bot: #444654;
+}
+
+[data-theme="light"] {
+    --primary-bg: #ffffff;
+    --secondary-bg: #f7f7f8;
+    --sidebar-bg: #f7f7f8;
+    --accent-color: #10a37f;
+    --accent-hover: #0d906b;
+    --text-primary: #000000;
+    --text-secondary: #374151;
+    --text-muted: #6b7280;
+    --border-color: #d1d5db;
+    --input-bg: #ffffff;
+    --message-bg-user: #ffffff;
+    --message-bg-bot: #f7f7f8;
+}
 /* New Section Styles */
 .section {
     flex: 1;
@@ -470,3 +499,4 @@
         justify-content: center;
     }
 }
+
